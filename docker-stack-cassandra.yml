@@ -22,7 +22,7 @@ services:
 
 volumes:
   cassandraVol:
-      name: 'cassandra-{{.Task.Slot}}'
+      name: 'cassandra-data-{{.Task.Slot}}'
       driver: rexray/rbd
 
 networks:
