@@ -2,8 +2,6 @@ version: '3.7'
 services:
   cassandra:
     image: 192.168.6.185/zrar/cassandra:3.11.3
-    environment:
-      CASSANDRA_CLUSTER_NAME: kshare
     entrypoint:
      - "sh"
      - "-c"
