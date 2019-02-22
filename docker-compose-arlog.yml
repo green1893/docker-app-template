@@ -1,0 +1,45 @@
+version: '2'
+services:
+  arlog:
+    container_name: arlog
+    image: 192.168.6.185/zrar/arlog:1.2.3
+    volumes:
+      - ./data/access:/data/arlog/
+    ports:
+      - 8081:8080
+    networks:
+      - kshare
+
+  logstash:
+    container_name: logstash
+    image: 192.168.6.185/zrar/logstash:5.6.14
+    environment:
+      - "XPACK_MONITORING_ENABLED=false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/geoip:/usr/share/logstash/geoip
+    extra_hosts:
+      - "es:172.16.30.190"
+      - "kafka:172.16.30.186"
+    networks:
+      - kshare
+
+  filebeat:
+    container_name: filebeat
+    image: 192.168.6.185/zrar/filebeat:5.6.14
+    user: root
+    depends_on:
+      - logstash
+    volumes:
+      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./data/filebeat:/usr/share/filebeat/data/
+      - ./data/access:/data/arlog:ro
+    networks:
+      - kshare
+
+networks:
+  kshare:
