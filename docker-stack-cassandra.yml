@@ -1,0 +1,34 @@
+version: '3.7'
+services:
+  cassandra:
+    image: 192.168.6.185/zrar/cassandra:3.11.3
+    environment:
+      CASSANDRA_CLUSTER_NAME: kshare
+      CASSANDRA_authenticator: PasswordAuthenticator
+    entrypoint:
+     - "sh"
+     - "-c"
+     -  export CASSANDRA_authenticator=PasswordAuthenticator; CASSANDRA_SEEDS=$$(nrOfTasks=`getent hosts tasks.cassandra | wc -l` ; many=`getent hosts tasks.cassandra | awk '{print $$1}' | sed "/$$(hostname --ip-address)/d" | paste -d, -s -` ; printf '%s' $$( [ $${nrOfTasks} -gt 1 ] && echo $${many} || echo "$$(hostname --ip-address)" )) ; /docker-entrypoint.sh cassandra -f
+    volumes:
+        - cassandraVol:/var/lib/cassandra
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.db == true]
+    resources:
+            limits:
+                memory: 1G
+            reservations:
+                memory: 200M
+    networks:
+     - kshare_product
+
+volumes:
+  cassandraVol:
+      name: 'cassandra-{{.Task.Slot}}'
+      driver: rexray/rbd
+
+networks:
+  kshare_product:
+    external:
+      name: kshare_product
