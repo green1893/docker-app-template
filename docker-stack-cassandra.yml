@@ -13,13 +13,13 @@ services:
         - cassandraVol:/var/lib/cassandra
     deploy:
       replicas: 1
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 200M
       placement:
         constraints: [node.labels.db == true]
-    resources:
-            limits:
-                memory: 1G
-            reservations:
-                memory: 200M
     networks:
      - kshare_product
 
