@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  elasticsearch:
+    image: 192.168.6.185/zrar/es:5.6.14
+    environment:
+      - cluster.name=kshare-es-cluster
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
+      - "discovery.zen.ping.unicast.hosts=tasks.elasticsearch"
+      - "discovery.zen.minimum_master_nodes=2"
+    deploy:
+        mode: replicated
+        placement:
+          constraints: [node.labels.es == true]
+    volumes:
+      - data:/usr/share/elasticsearch/data
+    networks:
+      - kshare_product
+      
+volumes:
+  data:
+    name: 'es-data-{{.Node.ID}}-{{.Task.Slot}}'
+    driver: rexray/rbd
+
+networks:
+  kshare_product:
+    external:
+      name: kshare_product
