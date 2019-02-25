@@ -3,7 +3,8 @@ services:
   cassandra:
     image: 192.168.6.185/zrar/cassandra:3.11.3
     environment:
-     - JVM_OPTS=-Xmx512m -Xms512m
+      HEAP_NEWSIZE: 256M
+      MAX_HEAP_SIZE: 512M
     entrypoint:
      - "sh"
      - "-c"
