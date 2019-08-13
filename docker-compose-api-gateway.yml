@@ -1,0 +1,39 @@
+version: '2'
+services:
+  zk_api:
+    container_name: zk_api
+    image: 192.168.2.150/zrar/css-zk
+    restart: always
+    ports:
+      - 2181:2181 
+    networks:
+      - api
+  web_api_service:
+    container_name: web_api_service
+    image: 192.168.2.150/zrar/arapi:2.0.2-service
+    restart: always
+    environment:
+      - "JAVA_OPTS=-Ddisconf.conf_server_host=192.168.2.172:8081 -Ddisconf.app=api_gateway -Ddisconf.env=rd -Ddisconf.version=arask"
+    depends_on:
+      - zk_api
+    extra_hosts:
+      - "zk_api:192.168.6.193"
+    networks:
+      - api
+  web_api:
+    container_name: web_api
+    image: 192.168.2.150/zrar/arapi:2.0.2
+    restart: always
+    environment:
+      - "JAVA_OPTS=-Ddisconf.conf_server_host=192.168.2.172:8081 -Ddisconf.app=api_gateway -Ddisconf.env=rd -Ddisconf.version=arask"
+    ports:
+      - 8080:8080
+    depends_on:
+      - web_api_service
+    extra_hosts:
+      - "zk_api:192.168.6.193"
+    networks:
+      - api
+networks:
+  api:
+
